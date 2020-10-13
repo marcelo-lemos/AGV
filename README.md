@@ -10,7 +10,8 @@ Esse trabalho consiste em ajudar Márcio, um administrador de sistemas a program
 
 A solução da tarefa envolve um agente que resolve o problema através de busca, chamado de _Problem-Solving Agent_. O objetivo do agente é um _goal_, ou seja um conjunto de estados, e ele busca uma sequência de ações para atingí-lo a partir do seu estado inicial.
 Como visto na descrição do problema, o ambiente que o agente irá trabalhar é estático, observável, discreto e determinístico.
-
+A implementação foi feita da seguinte maneira: primeiramente, buscamos e salvamos as informações da entrada (as dimensões e o valor de W e o mapa). A partir disso, foi gerado um grafo com o auxílio da biblioteca _graph-theory_. A peculiaridade desse grafo é que ele inclui apenas os pontos relevantes para a solução do problema, ou seja, os pontos de entrada, de abastecimento e o _goal_.
+A partir do comando identificado na instrução de execução, ele segue a aplicar um dos quatro algoritmos no grafo.
 Os estados do problema são todas as posições alcançáveis no mapa, ou seja, o conjunto de coordenadas que não estejam identificadas pelo símbolo de obstáculo \*. Além disso, excluímos os estados não alcançáveis devido à restrição pela necesidade do estado de abastecimento ('\#') após w passos, pois o veículo não pode trafegar até o local apesar dos comandos enviados.
 Os estados iniciais definidos para cada mapa de dimensão x por y é dado pelo conjunto de coordenadas das laterais do mapa que não estejam identificadas pelo símbolo de obstáculo \*, ou:
 [0, i], para todo 0 $\leq$ i $<$ x && [0, i] $\neq$ '\*'
