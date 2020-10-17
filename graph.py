@@ -119,14 +119,14 @@ class Graph:
 
     def dfs(self, start):
         open_list = [(start, [], 0)]
-        closed_list = []
         shortest_path = None
         shortest_distance = None
 
         while open_list:
             node, path, distance = open_list.pop()
+            if shortest_distance is not None and distance > shortest_distance:
+                continue
             path.append(node)
-            closed_list.append(node)
 
             if node.value == '$':
                 if shortest_distance is None or distance < shortest_distance:
