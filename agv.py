@@ -1,5 +1,4 @@
 import argparse
-import logging
 from dataclasses import dataclass
 from enum import Enum
 import sys
@@ -46,14 +45,12 @@ def get_adjacents(grid, point):
 
 
 def load_grid(filename):
-    logging.info(f'Loading map from file {filename}')
     with open(filename) as f:
         content = f.read().splitlines()
 
     meta = content.pop(0).split()
     map_ = content
 
-    logging.info(f'Map loaded')
     return meta, map_
 
 
@@ -156,16 +153,11 @@ def generate_graph(grid, checkpoint_distance):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format='%(asctime)s - %(levelname)s - %(name)s - %(message)s')
 
-    logging.info('Parsing command line arguments')
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', '--algorithm', required=True)
     parser.add_argument('-i', '--input', required=True)
     cmd_args = parser.parse_args()
-    logging.info('Command line arguments parsed')
 
     meta, grid = load_grid(cmd_args.input)
     height, width, checkpoint_distance = meta
@@ -187,8 +179,10 @@ if __name__ == '__main__':
         checkpoints = graph.count_checkpoints(path)
         entry_point = path[1].key
         print(f'{dist} {checkpoints} [{entry_point.x} , {entry_point.y}]')
-    else:
+    elif cmd_args.algorithm == 'a_star':
         path, dist = graph.a_star(start, goal)
         checkpoints = graph.count_checkpoints(path)
         entry_point = path[1].key
         print(f'{dist} {checkpoints} [{entry_point.x} , {entry_point.y}]')
+    else:
+        print(f'Unknown algorithm: {cmd_args.algorithm}')
