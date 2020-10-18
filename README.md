@@ -10,7 +10,7 @@ Esse trabalho consiste em ajudar Márcio, um administrador de sistemas a program
 
 A solução da tarefa envolve um agente que resolve o problema através de busca, chamado de _Problem-Solving Agent_. O objetivo do agente é um _goal_, ou seja um conjunto de estados, e ele busca uma sequência de ações para atingí-lo a partir do seu estado inicial.
 Como visto na descrição do problema, o ambiente que o agente irá trabalhar é estático, observável, discreto e determinístico.
-A implementação foi feita da seguinte maneira: primeiramente, buscamos e salvamos as informações da entrada (as dimensões e o valor de W e o mapa). A partir disso, foi gerado um grafo com o auxílio da biblioteca _graph-theory_. A peculiaridade desse grafo é que ele inclui apenas os pontos relevantes para a solução do problema, ou seja, os pontos de entrada, de abastecimento e o _goal_.
+A implementação foi feita da seguinte maneira: primeiramente, buscamos e salvamos as informações da entrada (as dimensões e o valor de W e o mapa). A partir disso, foi gerado um grafo. A peculiaridade desse grafo é que ele inclui apenas os pontos relevantes para a solução do problema, ou seja, os pontos de entrada, de abastecimento e o _goal_. Isso foi feito rodando o algoritmo de Dijkstra para encontrar a distância entre eles.
 A partir do comando identificado na instrução de execução, ele segue a aplicar um dos quatro algoritmos no grafo.
 Os estados do problema são todas as posições alcançáveis no mapa, ou seja, o conjunto de coordenadas que não estejam identificadas pelo símbolo de obstáculo \*. Além disso, excluímos os estados não alcançáveis devido à restrição pela necesidade do estado de abastecimento ('\#') após w passos, pois o veículo não pode trafegar até o local apesar dos comandos enviados.
 Os estados iniciais definidos para cada mapa de dimensão x por y é dado pelo conjunto de coordenadas das laterais do mapa que não estejam identificadas pelo símbolo de obstáculo \*, ou:
@@ -18,9 +18,9 @@ Os estados iniciais definidos para cada mapa de dimensão x por y é dado pelo c
 $\cup$
 [j, 0], para todo 0 $\leq$ j $<$ y && [j, 0] $\neq$ '\*'
 $\cup$
-[k, i], para todo 0 $\leq$ i $<$ x && k = y - 1 && [k, i] $\neq$ '\*' 
+[k, i], para todo 0 $\leq$ i $<$ x && k = y - 1 && [k, i] $\neq$ '\*'
 $\cup$
-[j, l], para todo 0 $\leq$ j $<$ y && l = x - 1 && [j, l] $\neq$ '\*' 
+[j, l], para todo 0 $\leq$ j $<$ y && l = x - 1 && [j, l] $\neq$ '\*'
 As ações são as direções que o AGV pode andar, ou seja, baixo, cima, esquerda, direita.
 O teste do objetivo consiste em saber se o veículo, depois de uma sequência de instruções, chegou até o _goal_, ou seja, a coordenada do mapa identificada por '\$'.
 O custo de cada ação é 1.
@@ -29,7 +29,7 @@ O custo de cada ação é 1.
 
 ##### 3.1. BFS
 
-O BFS é um algoritmo de busca sem informação completo, ou seja, através do estado inicial, das funções de transição e seus custos e o estado final, ele consegue encontrar a solução se ela existir. Ele consiste em expandir o nó mais raso que ainda não foi expandido. Em outras palavras, ele organiza os nós da fronteira em uma fila. Por esse motivo, não é necessário fazer a expansão antes de verificar se estamos no _goal_. Para o problema em questão, ele é ótimo, pois o custo para qualquer ação é 1. Para analisar a complexidade do algoritmo para a solução, vamos considerar o branch factor de 4 (pois temos quatro direções possíveis na maioria dos casos) e o nível da solução d: $O(4^{d})$. Em questão do espaço, ele também é exponencial, pois os nós precisam ser mantidos na memória.
+O BFS é um algoritmo de busca sem informação completo, ou seja, através do estado inicial, das funções de transição e seus custos e o estado final, ele consegue encontrar a solução se ela existir. Ele consiste em expandir o nó mais raso que ainda não foi expandido. Em outras palavras, ele organiza os nós da fronteira em uma fila. Por esse motivo, não é necessário fazer a expansão antes de verificar se estamos no _goal_. Como nosso grafo não tem custo uniforme, ele não sempre encontra a solução logo de cara. É necessário continuar a busca enquanto houver fronteira. Para analisar a complexidade do algoritmo para a solução, vamos considerar o branch factor de 4 (pois temos quatro direções possíveis na maioria dos casos) e o nível da solução d: $O(4^{d})$. Em questão do espaço, ele também é exponencial, pois os nós precisam ser mantidos na memória.
 
 ##### 3.2. DFS
 
@@ -39,9 +39,9 @@ Assim como o BFS, o DFS é um algoritmo de busca sem informação. Porém, ao co
 
 Esse algoritmo define um limite e várias buscas em profundidade dentro desse limite, aumentando-o a cada iteração. A vantagem dele é a combinação dos benefícios do BFS e do DFS: ele é completo e ótimo e com custo de memória linear. Pode ser considerado o melhor entre os algoritmos citados até agora.
 
-##### 3.4. A*
+##### 3.4. A\*
 
-Ao contrário dos algoritmos anteriores, o A\* é um algoritmo de busca com informação. Isso quer dizer que ele tenta utilizar alguma informação além da que está presente na formulação do problema para realizar a busca de forma mais eficiente. Para isso, ele usa uma função de avaliação $f(n)$ para cada nó, decidindo expandir o nó com menor $f(n)$. Em geral, $f(n)$ utiliza alguma heurística para guiar a ordem de expansão dos nós. A heurística para um nó n $h(n)$ é o custo estimado do nó até o _goal_. O algoritmo A\* é possivelmente o algoritmo de busca com informação mais rápido, que expande a menor quatidade de nós e garante a solução ótima (se utilizar uma heurística admissível, que será explicado a seguir). Ele consiste em escolher o nó a ser investigado considerando $f(n) = g(n) + f(n)$, no qual $g(n)$ é o custo real para chegar no nó em questão e $h(n)$ é o custo estimado para chegar ao _goal_. O A\* é completo e sua complexidade de tempo é exponencial, dependendo da solução (e não da profundidade), assim como sua complexidade de espaço, pois os nós são guardados na memória. 
+Ao contrário dos algoritmos anteriores, o A\* é um algoritmo de busca com informação. Isso quer dizer que ele tenta utilizar alguma informação além da que está presente na formulação do problema para realizar a busca de forma mais eficiente. Para isso, ele usa uma função de avaliação $f(n)$ para cada nó, decidindo expandir o nó com menor $f(n)$. Em geral, $f(n)$ utiliza alguma heurística para guiar a ordem de expansão dos nós. A heurística para um nó n $h(n)$ é o custo estimado do nó até o _goal_. O algoritmo A\* é possivelmente o algoritmo de busca com informação mais rápido, que expande a menor quatidade de nós e garante a solução ótima (se utilizar uma heurística admissível, que será explicado a seguir). Ele consiste em escolher o nó a ser investigado considerando $f(n) = g(n) + f(n)$, no qual $g(n)$ é o custo real para chegar no nó em questão e $h(n)$ é o custo estimado para chegar ao _goal_. O A\* é completo e sua complexidade de tempo é exponencial, dependendo da solução (e não da profundidade), assim como sua complexidade de espaço, pois os nós são guardados na memória.
 
 ### 4. Heurística - Distância de Manhattan
 
@@ -51,22 +51,23 @@ Para o algoritmo A\*, devido à natureza bimensional do mapa do problema, foi es
 
 Com a ajuda das bibliotecas _time_ e _tracemalloc_, foi possível medir o tempo e espaço alocado durante a execução do programa para cada um dos casos de teste. A seguir vamos apresentar o resultado das execuções em formato de tabela e gráfico. Vale ressaltar que, para o DFS, não foi possível mensurar os resultados devido o elevado tempo de execução.
 
-Primeiramente, a tabela e o gráfico relativos ao tempo. Qualquer valor do gráfico que alcança o topo do gráfico (2.5 segundos) é considerado maior que o limite deste. Na tabela, podemos ver os valores que foram observáveis. Para o DFS, temos alguns valores não encontrados, identificados com '?'. Todos esses valores são no mínimo de 10800 segundos.
+Primeiramente, a tabela e o gráfico relativos ao tempo. O gráfico está em escala logarítmica para ser possível visualizar melhor a comparação entre os valores. Os valores registrados indicam que o DFS demorou consideravelmente mais para executar, enquanto os outros, em geral, não apresentam uma variação tão grande.
 
-![image info](./tempo.png)
-![image info](./GTempo.png)
+![image info](./img/TabelaTempo.png)
+![image info](./img/GraficoTempo.png)
 
-Para o espaço, medido em MB, temos a mesma peculiaridade dos valores que atingem o limite do gráfico (4MB) serem maiores que isso. Os valores que foram observáveis estão na tabela relacionada.
+Para o espaço, o gráfico não está em escala logarítmica. Em geral, os algoritmos foram bem uniformes nesse aaspecto. A única execução que apresentou um valor elevado foi o IDS para o caso de teste input19x19-2.
 
-![image info](./espaco.png)
-![image info](./GEspaco.png)
+![image info](./img/TabelaEspaco.png)
+![image info](./img/GraficoEspaco.png)
 
-Por fim, temos a tabela de número de nós visitados por cada algoritmo em cada caso de teste:
+Por fim, temos a tabela de número de nós visitados por cada algoritmo em cada caso de teste. Como previsto pela definição dos algoritmos, o BFS e, especialmente, o A\* têm um tendência de visitar menos nós que o DFS e o IDS.
 
-![image info](./passos.png)
+![image info](./img/TabelaPassos.png)
+![image info](./img/GraficoPassos.png)
 
 ### 6. Discussão dos Resultados
 
-Como podemos ver pelos resultados - ou pela falta deles - o DFS apresentou a pior performance entre os quatro algoritmos. Especialmente em questão de tempo, que foi o que limitou os testes. Ainda sobre tempo, o A* e o BFS tiveram tempos de execução bem similares. Em geral, o IDS gastou mais tempo que os dois.
+Como podemos ver pelos resultados - ou pela falta deles - o DFS apresentou a pior performance entre os quatro algoritmos. Especialmente em questão de tempo, que foi o que limitou dois casos de testes. Ainda sobre tempo, o A* e o BFS tiveram tempos de execução bem similares.
 Não foi possível enxergar a vantagem do DFS em relação ao espaço, devido à adapatação dele para sempre encontrar a solução ótima.
 Sobre a quatidade de passos para cada algorítmo, foi nesse ponto que o algoritmo A*, uma busca com informação, mostrou-se valioso. É possível notar como ele expandiu uma menor quatidade de nós em relação aos outros três.
